@@ -1,16 +1,11 @@
-# ASP.NET Core (.NET Framework)
-# Build and test ASP.NET Core projects targeting the full .NET Framework.
-# Add steps that publish symbols, save build artifacts, and more:
-# https://docs.microsoft.com/azure/devops/pipelines/languages/dotnet-core
-
 trigger:
 - master
 
 pool:
-  vmImage: 'windows-latest'
+  name: mostafaPool
 
 variables:
-  solution: '**/*.sln'
+  solution: '/*.sln'
   buildPlatform: 'Any CPU'
   buildConfiguration: 'Release'
 
@@ -28,7 +23,17 @@ steps:
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'
 
+- task: PublishBuildArtifacts@1
+
 - task: VSTest@2
   inputs:
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'
+
+- task: AzureRmWebAppDeployment@4
+  inputs:
+    ConnectionType: 'AzureRM'
+    azureSubscription: 'MSDN Platforms Subscription(1)(9a26c157-766d-4f46-8684-861804aef110)'
+    appType: 'webApp'
+    WebAppName: 'MostafaTest'
+    packageForLinux: '$(build.artifactStagingDirectory)\WebApp.zip'
